@@ -1,0 +1,30 @@
+# Copy to ~/.dbt/profiles.yml and replace the placeholders.
+# Never commit the real file: it is gitignored.
+thelook_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth                      # gcloud auth application-default login
+      project: YOUR_GCP_PROJECT
+      dataset: dbt_YOURNAME
+      location: US
+      threads: 8
+      job_execution_timeout_seconds: 300
+      maximum_bytes_billed: 5000000000   # 5 GB cap per query
+      priority: interactive
+    ci:
+      type: bigquery
+      method: oauth                      # credentials come from Workload Identity Federation in Actions
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: "{{ env_var('DBT_CI_DATASET') }}"
+      location: US
+      threads: 8
+      maximum_bytes_billed: 5000000000
+    prod:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: analytics
+      location: US
+      threads: 16
