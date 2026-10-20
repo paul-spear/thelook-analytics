@@ -1,0 +1,5 @@
+# Every path has an owner. Marts and the semantic layer are interfaces: changes need owner review.
+*                      @paul-spear
+/models/marts/         @paul-spear
+/models/semantic/      @paul-spear
+/docs/standards.md     @paul-spear

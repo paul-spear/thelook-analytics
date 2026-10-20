@@ -1,0 +1,21 @@
+# dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets: never commit credentials
+.env
+*.json.key
+*-key.json
+profiles.yml
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

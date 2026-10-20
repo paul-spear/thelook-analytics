@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: pre-commit/action@v3.0.1
+
+  # Runs only once the GCP repository variables are set (build guide: GitHub workflow, step 6).
+  # Set GCP_PROJECT, GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT under
+  # Settings > Secrets and variables > Actions > Variables.
+  dbt:
+    needs: lint
+    if: github.event_name == 'pull_request' && vars.GCP_WORKLOAD_IDENTITY_PROVIDER != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+      DBT_CI_DATASET: ci_pr_${{ github.event.number }}
+      DBT_PROFILES_DIR: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+      - run: cp profiles.yml.example profiles.yml
+      - run: dbt deps
+      # TODO (Phase 9): download prod manifest.json and switch to
+      #   dbt build --select state:modified+ --defer --state ./prod-artifacts
+      - run: dbt build --target ci
