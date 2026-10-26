@@ -38,5 +38,4 @@ snapshots:
     +meta: {layer: normalised}
 
 query-comment:
-  comment: "{{ query_comment(node) }}"
-  job-label: true
+  job-label: true   # copy the query comment into BigQuery job labels for cost attribution

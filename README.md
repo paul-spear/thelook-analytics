@@ -42,12 +42,16 @@ pip install -r requirements.txt
 pre-commit install
 
 gcloud auth application-default login
-mkdir -p ~/.dbt && cp profiles.yml.example ~/.dbt/profiles.yml   # then edit the placeholders
+mkdir -p ~/.dbt   # then add the thelook_analytics block from profiles.yml.example to ~/.dbt/profiles.yml
 bq mk --location=US --dataset YOUR_GCP_PROJECT:raw_thelook
 
 dbt deps
 dbt debug
 ```
+
+This project runs on **dbt Core** from `.venv`, not dbt Fusion, because Fusion did not enforce
+`maximum_bytes_billed` in testing ([ADR-001](docs/adr/001-dbt-core-over-fusion.md)). If a
+system-wide `dbt` is installed, check `which dbt` points into `.venv` before running anything.
 
 Daily run order (it matters):
 
@@ -73,5 +77,6 @@ Model and column documentation lives in the dbt YAML files and is published with
 
 ## Cost safety
 
-Every target sets `maximum_bytes_billed` (5 GB per query in dev). Large facts are
+Every target sets `maximum_bytes_billed` (5 GB per query in dev), enforced by dbt Core.
+A monthly budget alert on the GCP project emails at 25%, 50%, 90% and 100% of £20. Large facts are
 partitioned and use `require_partition_filter`. Do not remove these.
