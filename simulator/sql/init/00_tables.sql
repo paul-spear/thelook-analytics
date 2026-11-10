@@ -26,6 +26,27 @@ cluster by order_id;
 -- dataset (the BigQuery sandbox sets 60 days) would delete rows the moment they land.
 alter table `${project}.${raw}.orders_changes` set options (partition_expiration_days = null);
 
+-- Append-only change log: one row per order item status change, on the day it happened.
+create table if not exists `${project}.${raw}.order_items_changes` (
+  id int64,
+  order_id int64,
+  user_id int64,
+  product_id int64,
+  inventory_item_id int64,
+  sale_price float64,
+  created_at timestamp,
+  status string,
+  updated_at timestamp,
+  _sim_date date,
+  _loaded_at timestamp
+)
+partition by _sim_date
+cluster by order_id;
+
+-- Simulated dates are months in the past, so any partition expiry inherited from the
+-- dataset (the BigQuery sandbox sets 60 days) would delete rows the moment they land.
+alter table `${project}.${raw}.order_items_changes` set options (partition_expiration_days = null);
+
 -- Accumulated user mutations. Each row holds the full set of mutable attributes
 -- as of effective_date, so the latest row per user is that user's current state.
 create table if not exists `${project}.${raw}._user_overrides` (

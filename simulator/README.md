@@ -37,8 +37,8 @@ Two time columns on every landed row:
 | --- | --- | --- |
 | `orders_changes` | Append-only change log, one row per status change, partitioned by `_sim_date` | Built |
 | `users` | Full extract, replaced each run; moves and email changes applied from `_user_overrides` | Built |
-| `products` | Full extract with price changes and an `updated_at` column | To build |
-| `order_items_changes` | Change log with late and duplicate rows | To build |
+| `products` | Full extract with price changes and an `updated_at` column | Built |
+| `order_items_changes` | Change log with late and duplicate rows | Built |
 | `events` | Append-only, partitioned by day | To build |
 
 ## Mutations
