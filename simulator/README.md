@@ -61,3 +61,10 @@ expiry on datasets. Simulated dates are months old, so partitions inherited that
 were deleted on write, silently. `raw_thelook` no longer has the default, and
 `sql/init/00_tables.sql` clears it explicitly on each partitioned table. Do the same for any
 new partitioned raw table.
+
+## Known Quirks
+
+Known quirks, deliberately left in: a move keeps the old `latitude`/`longitude`, and a
+donor address can be in another country. In theLook itself, 30% of shipped order items have
+`shipped_at` before their own `created_at` (item creation times are random relative to the
+order). Raw keeps this as-is; Phase 2 staging must correct it before any SCD2 logic.
