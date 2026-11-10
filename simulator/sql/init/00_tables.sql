@@ -39,3 +39,12 @@ create table if not exists `${project}.${raw}._user_overrides` (
   country string,
   change_type string         -- 'move', 'email' or 'move+email'
 );
+
+-- Accumulated product mutations.
+-- The latest row per product is its current price
+create table if not exists `${project}.${raw}._product_overrides` (
+  product_id int64,
+  effective_date date,
+  retail_price float64,
+  change_type string         -- 'price_up' or 'price_down'
+);
