@@ -39,7 +39,7 @@ Two time columns on every landed row:
 | `users` | Full extract, replaced each run; moves and email changes applied from `_user_overrides` | Built |
 | `products` | Full extract with price changes and an `updated_at` column | Built |
 | `order_items_changes` | Change log with late and duplicate rows | Built |
-| `events` | Append-only, partitioned by day | To build |
+| `events` | Append-only, partitioned by day | Built |
 
 ## Mutations
 

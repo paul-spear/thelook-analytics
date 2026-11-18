@@ -43,9 +43,36 @@ create table if not exists `${project}.${raw}.order_items_changes` (
 partition by _sim_date
 cluster by order_id;
 
+
 -- Simulated dates are months in the past, so any partition expiry inherited from the
 -- dataset (the BigQuery sandbox sets 60 days) would delete rows the moment they land.
 alter table `${project}.${raw}.order_items_changes` set options (partition_expiration_days = null);
+
+
+-- Append-only: every web event, landed on the day it happened.
+create table if not exists `${project}.${raw}.events` (
+  id int64,
+  user_id int64,
+  sequence_number int64,
+  session_id string,
+  created_at timestamp,
+  ip_address string,
+  city string,
+  state string,
+  postal_code string,
+  browser string,
+  traffic_source string,
+  uri string,
+  event_type string,
+  _sim_date date,
+  _loaded_at timestamp
+)
+partition by _sim_date
+cluster by session_id;
+
+-- Simulated dates are months in the past, so any partition expiry inherited from the
+-- dataset (the BigQuery sandbox sets 60 days) would delete rows the moment they land.
+alter table `${project}.${raw}.events` set options (partition_expiration_days = null);
 
 -- Accumulated user mutations. Each row holds the full set of mutable attributes
 -- as of effective_date, so the latest row per user is that user's current state.
